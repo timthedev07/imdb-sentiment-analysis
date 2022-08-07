@@ -5,7 +5,7 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.python.keras import Sequential as ST
-from tensorflow.keras.layers import Dense, Embedding, LSTM, Dropout
+from tensorflow.keras.layers import Dense, Embedding, GlobalAveragePooling1D, Dropout
 from tensorflow.keras.layers import TextVectorization
 import nltk
 from nltk.corpus import stopwords
@@ -17,7 +17,7 @@ pj = os.path.join
 # the number of nodes in the hidden layers
 HIDDEN_SIZE_L1 = 256
 HIDDEN_SIZE_L2 = 128
-EPOCHS = 5
+EPOCHS = 15
 VOCAB_SIZE = 10000
 SEQUENCE_LENGTH = 100
 
@@ -71,9 +71,10 @@ def getTrainedModel() -> ST:
     model = Sequential([
         vectorize_layer,
         Embedding(VOCAB_SIZE, embedding_dim, name="embedding"),
+        GlobalAveragePooling1D(),
+        Dense(16, activation='relu'),
         Dropout(0.3),
-        LSTM(128, recurrent_dropout=0.2, dropout=0.2),
-        Dense(1, activation="softmax")
+        Dense(1, activation='sigmoid')
     ])
 
     model.compile(
