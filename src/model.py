@@ -74,12 +74,12 @@ def getTrainedModel() -> ST:
         GlobalAveragePooling1D(),
         Dense(16, activation='relu'),
         Dropout(0.3),
-        Dense(1, activation='sigmoid')
+        Dense(1)
     ])
 
     model.compile(
         optimizer='adam',
-        loss="categorical_crossentropy",
+        loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
         metrics=['accuracy']
     )
 
