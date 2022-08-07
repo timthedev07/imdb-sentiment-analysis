@@ -5,7 +5,7 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow.keras import Sequential
 from tensorflow.python.keras import Sequential as ST
-from tensorflow.keras.layers import Dense, Embedding, GlobalAveragePooling1D
+from tensorflow.keras.layers import Dense, Embedding, LSTM, Dropout
 from tensorflow.keras.layers import TextVectorization
 import nltk
 from nltk.corpus import stopwords
@@ -13,6 +13,13 @@ from nltk.corpus import stopwords
 dataDir = "data-csv"
 
 pj = os.path.join
+
+# the number of nodes in the hidden layers
+HIDDEN_SIZE_L1 = 256
+HIDDEN_SIZE_L2 = 128
+EPOCHS = 5
+VOCAB_SIZE = 10000
+SEQUENCE_LENGTH = 100
 
 def readCSV():
     train = pd.read_csv(pj(dataDir, "train.csv"), encoding="utf-8")
@@ -34,8 +41,6 @@ def getTrainedModel() -> ST:
     (trainX, trainY, testX, testY) = getDataset()
 
     # Vocabulary size and number of words in a sequence.
-    vocab_size = 10000
-    sequence_length = 100
 
     nltk.download('stopwords')
 
@@ -55,9 +60,9 @@ def getTrainedModel() -> ST:
 
     vectorize_layer = TextVectorization(
         standardize=custom_standardization,
-        max_tokens=vocab_size,
+        max_tokens=VOCAB_SIZE,
         output_mode='int',
-        output_sequence_length=sequence_length)
+        output_sequence_length=SEQUENCE_LENGTH)
 
     vectorize_layer.adapt(trainX + testX)
 
@@ -65,19 +70,23 @@ def getTrainedModel() -> ST:
 
     model = Sequential([
         vectorize_layer,
-        Embedding(vocab_size, embedding_dim, name="embedding"),
-        GlobalAveragePooling1D(),
-        Dense(16, activation='relu'),
-        Dense(1)
+        Embedding(VOCAB_SIZE, embedding_dim, name="embedding"),
+        Dropout(0.3),
+        LSTM(128, recurrent_dropout=0.2, dropout=0.2),
+        Dense(1, activation="softmax")
     ])
 
-    model.compile(optimizer='adam',
-              loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
-              metrics=['accuracy'])
+    model.compile(
+        optimizer='adam',
+        loss="categorical_crossentropy",
+        metrics=['accuracy']
+    )
 
-    model.fit(trainX, trainY, epochs=15)
+    model.fit(trainX, trainY, epochs=EPOCHS, batch_size=32)
     print("\nTesting result:")
     model.evaluate(testX, testY, verbose=2)
+    print()
+    model.summary()
 
     return model
 
