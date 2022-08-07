@@ -72,8 +72,8 @@ def getTrainedModel() -> ST:
         vectorize_layer,
         Embedding(VOCAB_SIZE, embedding_dim, name="embedding"),
         GlobalAveragePooling1D(),
-        Dense(16, activation='relu'),
-        Dropout(0.3),
+        Dense(32, activation='relu'),
+        Dropout(0.45),
         Dense(1)
     ])
 
