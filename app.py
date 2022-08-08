@@ -39,6 +39,10 @@ def home():
 
         model = loadModel()
         [[res]] = model.predict(data["text"])
-        return res, 200
+
+        return {
+            "value": res,
+            "sentiment": "negative" if res < 0 else ("positive" if res > 0 else "neutral")
+        }, 200
     else:
         return render_template("index.html")
