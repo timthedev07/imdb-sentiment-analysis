@@ -1,5 +1,9 @@
 # IMDb Sentiment Analysis
 
+## Online Demo
+
+Visit [this page](https://imdb-sentiment-analysis-demo.herokuapp.com/)
+
 ## Downloading the dataset
 
 ```bash
