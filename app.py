@@ -38,8 +38,6 @@ def home():
         if not data["text"]:
             return "Bad Request", 400
 
-        print(data["text"])
-
         model = loadModel()
         [[res]] = model.predict([data["text"]])
 
