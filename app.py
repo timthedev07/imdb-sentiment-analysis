@@ -9,6 +9,7 @@ SAVED_MODEL_DIR = "model"
 
 app = Flask(__name__)
 
+@tf.function
 def custom_standardization(input_data):
     stop_words = set(stopwords.words('english'))
 
@@ -37,11 +38,13 @@ def home():
         if not data["text"]:
             return "Bad Request", 400
 
+        print(data["text"])
+
         model = loadModel()
-        [[res]] = model.predict(data["text"])
+        [[res]] = model.predict([data["text"]])
 
         return {
-            "value": res,
+            "value": str(res),
             "sentiment": "negative" if res < 0 else ("positive" if res > 0 else "neutral")
         }, 200
     else:
